@@ -19,7 +19,7 @@
       get_url:
         url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
         dest: /usr/share/keyrings/jenkins-keyring.asc
-        mode: '0644'
+        mode: "0644"
         force: true
 
     - name: Add Jenkins repository

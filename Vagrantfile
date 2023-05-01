@@ -2,7 +2,8 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/bionic64"
+
+  config.vm.box = "ubuntu/jammy64"
   config.vm.box_check_update = false
   config.vm.network "forwarded_port", guest: 8080, host: 8080
 
@@ -10,8 +11,14 @@ Vagrant.configure("2") do |config|
     config.vbguest.auto_update = false
   end
 
-  config.vm.provision "ansible" do |ansible|
-    ansible.playbook = "playbook.yml"
-  end
+  config.vm.synced_folder "./ansible", "/ansible"
+
+  config.vm.provision "shell", inline: <<-SHELL
+    apt update && \
+    apt install -y python3 python3-pip && \
+    pip3 install setuptools-rust && \
+    CRYPTOGRAPHY_DONT_BUILD_RUST=1 pip3 install -U pip ansible && \
+    ansible-playbook /ansible/playbook.yml
+  SHELL
 
 end
