@@ -1,0 +1,48 @@
+---
+- hosts: localhost
+  connection: local
+  become: True
+
+  tasks:
+    - name: Upgrade packages
+      apt:
+        upgrade: dist
+        update_cache: yes
+
+    - name: Install base packages
+      apt: name={{ item }} update_cache=yes cache_valid_time=3600
+      with_items:
+        - fontconfig
+        - openjdk-11-jre
+
+    - name: Add Jenkins key
+      get_url:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+        dest: /usr/share/keyrings/jenkins-keyring.asc
+        mode: '0644'
+        force: true
+
+    - name: Add Jenkins repository
+      apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
+        state: present
+
+    - name: Clean apt lists
+      file:
+        path: "/var/lib/apt/lists/*"
+        state: absent
+
+    - name: Update apt following apt mergelists fix
+      apt:
+        update_cache: yes
+
+    - name: Install Jenkins
+      apt:
+        name: jenkins
+        update_cache: yes
+
+    - name: Start jenkins
+      systemd:
+        name: jenkins
+        state: started
+        enabled: true
