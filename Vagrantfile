@@ -1,4 +1,3 @@
-# Erich EJ Best 
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
@@ -14,9 +13,8 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "ansible_local" do |ansible|
     ansible.playbook = "playbook.yml"
-    ansible.verbose  = true
+    ansible.verbose  = false
     ansible.install  = true
     ansible.install_mode = :default
-    #ansible.inventory_path = "inventory"
   end
 end
